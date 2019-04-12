@@ -1,7 +1,11 @@
 package huaweiPush
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"golang.org/x/net/context/ctxhttp"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -76,6 +80,49 @@ func FormPost(url string, data url.Values) ([]byte, error) {
 		return []byte(""), err
 	}
 	return b, err
+}
+
+func doPost(ctx context.Context, url string, form url.Values) ([]byte, error) {
+	var result []byte
+	var req *http.Request
+	var res *http.Response
+	var err error
+	req, err = http.NewRequest("POST", url, strings.NewReader(form.Encode()))
+	if err != nil {
+		panic(err)
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
+	client := &http.Client{}
+	tryTime := 0
+
+	for tryTime < PostRetryTimes {
+		res, err = ctxhttp.Do(ctx, client, req)
+		if err != nil {
+			fmt.Println("huawei push post err:", err, tryTime)
+			select {
+			case <-ctx.Done():
+				return nil, err
+			default:
+			}
+			tryTime += 1
+			if tryTime < PostRetryTimes {
+				continue
+			}
+			return nil, err
+		}
+		defer res.Body.Close()
+
+		if res.StatusCode != http.StatusOK {
+			return nil, errors.New("network error")
+		}
+		result, err = ioutil.ReadAll(res.Body)
+		if err != nil {
+			return nil, err
+		}
+		return result, nil
+	}
+
+	return []byte("unknow error"), nil
 }
 
 /**
@@ -162,7 +209,7 @@ func (this HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string
 	param["payload"] = []string{originParam["payload"]}
 
 	// push
-	res, _ := FormPost(reqUrl, param)
+	res, _ := doPost(context.Background(), reqUrl, param)
 
 	return string(res)
 }

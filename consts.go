@@ -37,6 +37,10 @@ type TokenResStruct struct {
 	Token_type   string `json:"token_type"`
 }
 
+var (
+	PostRetryTimes = 3
+)
+
 /**
  **************************************** 消息体
  */
