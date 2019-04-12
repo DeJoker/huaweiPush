@@ -44,20 +44,17 @@ func NewMessage() *Message {
 					Title:   "",
 				},
 				Action: Action{
-					Type: 1, //1, 自定义行为; 2, 打开URL; 3, 打开App;
+					Type: 3, //1, 自定义行为; 2, 打开URL; 3, 打开App;
 					Param: Param{
-						Intent: "#Intent;compo=com.rvr/.Activity;S.W=U;end",
+						Intent: "",
 						AppPkgName:"",
+						Url:"",
 					},
 				},
 			},
 			Ext: Ext{ // 扩展信息, 含 BI 消息统计, 特定展示风格, 消息折叠;
-				Action:  "",
-				Func:    "",
-				Collect: "",
-				Title:   "",
-				Content: "",
-				Url:     "",
+				BigTag : "",
+				Customize : []map[string]interface{}{},
 			},
 		},
 	}
@@ -208,6 +205,7 @@ func (this HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string
 	param["device_token_list"] = []string{originParam["device_token_list"]}
 	param["payload"] = []string{originParam["payload"]}
 
+	fmt.Println(param)
 	// push
 	res, _ := doPost(context.Background(), reqUrl, param)
 

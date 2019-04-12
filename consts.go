@@ -69,18 +69,17 @@ type Action struct {
 type Param struct {
 	Intent string `json:"intent"`
 	AppPkgName string `json:"appPkgName"`
+	Url string `json:"url"`
 }
 
 type ExtObj struct {
 	Name string
 }
 type Ext struct {
-	Action  string `json:"action"`
-	Func    string `json:"func"`
-	Collect string `json:"collect"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-	Url     string `json:"url"`
+	BadgeAddNum string `json:"badgeAddNum"`	//设置应用角标数值，取值范围1-99
+	BadgeClass string `json:"badgeClass"`		//桌面图标对应的应用入口Activity类  例如“com.test.badge.MainActivity”
+	BigTag string `json:"biTag"`				//设置消息标签，如果带了这个标签，会在回执中推送给CP用于检测某种类型消息的到达率和状态。
+	Customize []map[string]interface{} `json:"customize"`		//"hps"->"ext"->"customize"下的内容为用户自定义扩展信息，开发者可以通过该消息实现onEvent点击事件的触发
 }
 
 /**
@@ -107,29 +106,21 @@ func (this *Message) SetAppPkgName(appPkgName string) *Message {
 	return this
 }
 
-func (this *Message) SetExtAction(Action string) *Message {
-	this.Hps.Ext.Action = Action
-	return this
-}
-func (this *Message) SetExtFunc(Func string) *Message {
-	this.Hps.Ext.Func = Func
-	return this
-}
-func (this *Message) SetExtCollect(collect string) *Message {
-	this.Hps.Ext.Collect = collect
-	return this
-}
-func (this *Message) SetExtTitle(title string) *Message {
-	this.Hps.Ext.Title = title
-	return this
-}
-func (this *Message) SetExtContent(content string) *Message {
-	this.Hps.Ext.Collect = content
+func (this *Message) SetActionType(actionType int) *Message {
+	this.Hps.Msg.Action.Type = actionType
 	return this
 }
 
-func (this *Message) SetExtUrl(url string) *Message {
-	this.Hps.Ext.Url = url
+func (this *Message) SetExtCustmoize(exts map[string]interface{}) *Message {
+	huaweiCustomize := []map[string]interface{}{}
+
+	for key, value := range exts {
+		m := map[string]interface{}{}
+		m[key] = value
+		huaweiCustomize = append(huaweiCustomize, m)
+	}
+
+	this.Hps.Ext.Customize = huaweiCustomize
 	return this
 }
 
