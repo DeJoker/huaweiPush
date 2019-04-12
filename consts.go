@@ -1,4 +1,4 @@
-package hw_push
+package huaweiPush
 
 import (
 	"encoding/json"
