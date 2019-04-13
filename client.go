@@ -86,7 +86,7 @@ func doPost(ctx context.Context, url string, form url.Values) ([]byte, error) {
 	var err error
 	req, err = http.NewRequest("POST", url, strings.NewReader(form.Encode()))
 	if err != nil {
-		panic(err)
+		return nil, errors.New(("create post request error"))
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
 	client := &http.Client{}

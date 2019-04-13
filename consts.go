@@ -2,6 +2,8 @@ package huaweiPush
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 )
 
 // url
@@ -127,7 +129,8 @@ func (this *Message) SetExtCustmoize(exts map[string]interface{}) *Message {
 func (this *Message) Json() string {
 	bytes, err := json.Marshal(this)
 	if err != nil {
-		panic(err)
+		fmt.Println(os.Stderr, err.Error())
+		return ""
 	}
 	return string(bytes)
 }
