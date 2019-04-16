@@ -54,7 +54,7 @@ func NewMessage() *Message {
 			},
 			Ext: Ext{ // 扩展信息, 含 BI 消息统计, 特定展示风格, 消息折叠;
 				BigTag : "",
-				Customize : []map[string]interface{}{},
+				Customize : []map[string]string{},
 			},
 		},
 	}
