@@ -69,19 +69,19 @@ type Action struct {
 	Param Param `json:"param"`
 }
 type Param struct {
-	Intent string `json:"intent"`
+	Intent     string `json:"intent"`
 	AppPkgName string `json:"appPkgName"`
-	Url string `json:"url"`
+	Url        string `json:"url"`
 }
 
 type ExtObj struct {
 	Name string
 }
 type Ext struct {
-	BadgeAddNum string `json:"badgeAddNum"`	//设置应用角标数值，取值范围1-99
-	BadgeClass string `json:"badgeClass"`		//桌面图标对应的应用入口Activity类  例如“com.test.badge.MainActivity”
-	BigTag string `json:"biTag"`				//设置消息标签，如果带了这个标签，会在回执中推送给CP用于检测某种类型消息的到达率和状态。
-	Customize []map[string]string `json:"customize"`		//"hps"->"ext"->"customize"下的内容为用户自定义扩展信息，开发者可以通过该消息实现onEvent点击事件的触发
+	BadgeAddNum string              `json:"badgeAddNum"` //设置应用角标数值，取值范围1-99
+	BadgeClass  string              `json:"badgeClass"`  //桌面图标对应的应用入口Activity类  例如“com.test.badge.MainActivity”
+	BigTag      string              `json:"biTag"`       //设置消息标签，如果带了这个标签，会在回执中推送给CP用于检测某种类型消息的到达率和状态。
+	Customize   []map[string]string `json:"customize"`   //"hps"->"ext"->"customize"下的内容为用户自定义扩展信息，开发者可以通过该消息实现onEvent点击事件的触发
 }
 
 /**
@@ -110,6 +110,11 @@ func (this *Message) SetAppPkgName(appPkgName string) *Message {
 
 func (this *Message) SetActionType(actionType int) *Message {
 	this.Hps.Msg.Action.Type = actionType
+	return this
+}
+
+func (this *Message) SetBigTag(bigTag string) *Message {
+	this.Hps.Ext.BigTag = bigTag
 	return this
 }
 
