@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/net/context/ctxhttp"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/net/context/ctxhttp"
 )
 
 /**
@@ -46,15 +47,15 @@ func NewMessage() *Message {
 				Action: Action{
 					Type: 3, //1, 自定义行为; 2, 打开URL; 3, 打开App;
 					Param: Param{
-						Intent: "",
-						AppPkgName:"",
-						Url:"",
+						Intent:     "",
+						AppPkgName: "",
+						Url:        "",
 					},
 				},
 			},
 			Ext: Ext{ // 扩展信息, 含 BI 消息统计, 特定展示风格, 消息折叠;
-				BigTag : "",
-				Customize : []map[string]string{},
+				BigTag:    "",
+				Customize: []map[string]string{},
 			},
 		},
 	}
@@ -165,7 +166,6 @@ func (this HuaweiPushClient) PushMsg(deviceToken, payload string, timeToLive int
 		"expire_time":       expireTime.Format("2006-01-02T15:04"),
 	}
 
-
 	param := make(url.Values)
 	param["access_token"] = []string{originParam["access_token"]}
 	param["nsp_svc"] = []string{originParam["nsp_svc"]}
@@ -173,7 +173,7 @@ func (this HuaweiPushClient) PushMsg(deviceToken, payload string, timeToLive int
 	param["device_token_list"] = []string{originParam["device_token_list"]}
 	param["payload"] = []string{originParam["payload"]}
 	param["expire_time"] = []string{originParam["expire_time"]}
-	
+
 	// push
 	res, _ := FormPost(reqUrl, param)
 
@@ -204,7 +204,6 @@ func (this HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string
 	}
 	originParam["device_token_list"] = string(jdeviceTokenArray)
 
-
 	param := make(url.Values)
 	param["access_token"] = []string{originParam["access_token"]}
 	param["nsp_svc"] = []string{originParam["nsp_svc"]}
@@ -212,6 +211,39 @@ func (this HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string
 	param["device_token_list"] = []string{originParam["device_token_list"]}
 	param["payload"] = []string{originParam["payload"]}
 	param["expire_time"] = []string{originParam["expire_time"]}
+
+	fmt.Println(param)
+	// push
+	res, _ := doPost(context.Background(), reqUrl, param)
+
+	return string(res)
+}
+
+func (this HuaweiPushClient) PushMsgToArrayNoExpire(deviceTokens []string, payload string) string {
+
+	accessToken := this.GetToken()
+	reqUrl := PUSH_URL + "?nsp_ctx=" + url.QueryEscape(this.NspCtx)
+
+	var originParam = map[string]string{
+		"access_token":      accessToken,
+		"nsp_svc":           NSP_SVC,
+		"nsp_ts":            strconv.Itoa(int(time.Now().Unix())),
+		"device_token_list": "",
+		"payload":           payload,
+	}
+
+	jdeviceTokenArray, jsonErr := json.Marshal(deviceTokens)
+	if jsonErr != nil {
+		jsonErr.Error()
+	}
+	originParam["device_token_list"] = string(jdeviceTokenArray)
+
+	param := make(url.Values)
+	param["access_token"] = []string{originParam["access_token"]}
+	param["nsp_svc"] = []string{originParam["nsp_svc"]}
+	param["nsp_ts"] = []string{originParam["nsp_ts"]}
+	param["device_token_list"] = []string{originParam["device_token_list"]}
+	param["payload"] = []string{originParam["payload"]}
 
 	fmt.Println(param)
 	// push
