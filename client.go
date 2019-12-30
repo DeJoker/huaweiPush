@@ -212,7 +212,6 @@ func (this HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string
 	param["payload"] = []string{originParam["payload"]}
 	param["expire_time"] = []string{originParam["expire_time"]}
 
-	fmt.Println(param)
 	// push
 	res, _ := doPost(context.Background(), reqUrl, param)
 
@@ -245,7 +244,6 @@ func (this HuaweiPushClient) PushMsgToArrayNoExpire(deviceTokens []string, paylo
 	param["device_token_list"] = []string{originParam["device_token_list"]}
 	param["payload"] = []string{originParam["payload"]}
 
-	fmt.Println(param)
 	// push
 	res, _ := doPost(context.Background(), reqUrl, param)
 

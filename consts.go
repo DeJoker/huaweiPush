@@ -82,6 +82,7 @@ type Ext struct {
 	BadgeClass  string              `json:"badgeClass"`  //桌面图标对应的应用入口Activity类  例如“com.test.badge.MainActivity”
 	BigTag      string              `json:"biTag"`       //设置消息标签，如果带了这个标签，会在回执中推送给CP用于检测某种类型消息的到达率和状态。
 	Customize   []map[string]string `json:"customize"`   //"hps"->"ext"->"customize"下的内容为用户自定义扩展信息，开发者可以通过该消息实现onEvent点击事件的触发
+	MsgGrp      string              `JSON:"msgGrp"`      //通知分组   相同msgGrp的会覆盖
 }
 
 /**
@@ -115,6 +116,11 @@ func (this *Message) SetActionType(actionType int) *Message {
 
 func (this *Message) SetBigTag(bigTag string) *Message {
 	this.Hps.Ext.BigTag = bigTag
+	return this
+}
+
+func (this *Message) SetMsgGrp(msgGrp string) *Message {
+	this.Hps.Ext.MsgGrp = msgGrp
 	return this
 }
 
