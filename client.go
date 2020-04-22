@@ -146,11 +146,9 @@ func (this HuaweiPushClient) GetToken() string {
 }
 
 /**
- * push msg
+ * push msg with token push into
  */
-func (this HuaweiPushClient) PushMsg(deviceToken, payload string, timeToLive int) string {
-
-	accessToken := this.GetToken()
+func (this HuaweiPushClient) PushMsg(accessToken, deviceToken, payload string, timeToLive int) string {
 	reqUrl := PUSH_URL + "?nsp_ctx=" + url.QueryEscape(this.NspCtx)
 
 	now := time.Now()
@@ -179,10 +177,12 @@ func (this HuaweiPushClient) PushMsg(deviceToken, payload string, timeToLive int
 
 	return string(res)
 }
-
 func (this HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string, timeToLive int) string {
-
 	accessToken := this.GetToken()
+	return this.PushToListWithToken(accessToken, deviceTokens, payload, timeToLive)
+}
+
+func (this HuaweiPushClient) PushToListWithToken(accessToken string, deviceTokens []string, payload string, timeToLive int) string {
 	reqUrl := PUSH_URL + "?nsp_ctx=" + url.QueryEscape(this.NspCtx)
 
 	now := time.Now()
