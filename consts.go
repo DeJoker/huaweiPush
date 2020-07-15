@@ -26,6 +26,8 @@ type HuaweiPushClient struct {
 	ClientId     string
 	ClientSecret string
 	NspCtx       string
+	AuthInfo     *TokenResult
+
 }
 
 type Vers struct {
@@ -33,10 +35,11 @@ type Vers struct {
 	AppID string `json:"appId"`
 }
 
-type TokenResStruct struct {
-	Access_token string `json:"access_token"`
-	Expires_in   int    `json:"expires_in"`
-	Token_type   string `json:"token_type"`
+type TokenResult struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+	TokenType   string `json:"token_type"`
+	validTime  int64
 }
 
 var (
@@ -140,7 +143,7 @@ func (this *Message) SetExtCustmoize(exts map[string]string) *Message {
 func (this *Message) Json() string {
 	bytes, err := json.Marshal(this)
 	if err != nil {
-		fmt.Println(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error())
 		return ""
 	}
 	return string(bytes)
