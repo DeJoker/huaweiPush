@@ -20,20 +20,19 @@ func TestViVoPush_Send(t *testing.T) {
 	message := NewMessage()
 
 	message.SetTitle("发送标题")
-	time.Now().String()
-	message.SetContent("发送内容"+time.Now().Format("2006-01-02T15:04:04.333"))
+
+	//message.SetContent("发送内容"+time.Now().Format("2006-01-02T15:04:04.333"))
 	message.SetAppPkgName(packageName)
 	message.SetBigTag(time.Now().String() + "-")
 
 
 
 	//msg1 := NewVivoMessage("标题", "内容", "")
-	result := client.PushMsgToList([]string{regID}, message.Json(), 1800)
-	t.Logf("result=%+v\n", result)
-	time.Sleep(10*time.Second)
-	result = client.PushMsgToList([]string{regID}, message.Json(), 1800)
-	t.Logf("result=%+v\n", result)
-	time.Sleep(3*time.Second)
-	result = client.PushMsgToList([]string{regID}, message.Json(), 1800)
-	t.Logf("result=%+v\n", result)
+	for i:=0; i<3; i++ {
+		message.SetContent("发送内容"+time.Now().Format("2006-01-02T15:04:04.333"))
+		result,err := client.PushMsgToList([]string{regID}, message.Json(), 1800)
+		t.Logf("%+v\n", result)
+		t.Log(err)
+		time.Sleep(2*time.Second)
+	}
 }

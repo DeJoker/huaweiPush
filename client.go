@@ -131,10 +131,10 @@ const (
 	OneHour = 3600 * 1000
 )
 
-func (hc *HuaweiPushClient) GetToken() string {
+func (hc *HuaweiPushClient) GetToken() (string, error) {
 	now := time.Now().UnixNano() / int64(time.Millisecond)
 	if hc.AuthInfo != nil && hc.AuthInfo.AccessToken != "" && hc.AuthInfo.validTime>now {
-		return hc.AuthInfo.AccessToken
+		return hc.AuthInfo.AccessToken, nil
 	}
 
 	reqUrl := TOKEN_URL
@@ -145,22 +145,22 @@ func (hc *HuaweiPushClient) GetToken() string {
 	res, err := FormPost(reqUrl, param)
 
 	if nil != err {
-		return ""
+		return "", err
 	}
 	var tokenRes = &TokenResult{}
 	err = json.Unmarshal(res, tokenRes)
 	if err != nil {
-		return ""
+		return "", err
 	}
 	hc.AuthInfo = tokenRes
 	hc.AuthInfo.validTime = now + OneHour
-	return tokenRes.AccessToken
+	return tokenRes.AccessToken, nil
 }
 
 /**
  * push msg with token push into
  */
-func (hc *HuaweiPushClient) PushMsg(accessToken, deviceToken, payload string, timeToLive int) string {
+func (hc *HuaweiPushClient) PushMsg(accessToken, deviceToken, payload string, timeToLive int) (string, error) {
 	reqUrl := PUSH_URL + "?nsp_ctx=" + url.QueryEscape(hc.NspCtx)
 
 	now := time.Now()
@@ -185,16 +185,19 @@ func (hc *HuaweiPushClient) PushMsg(accessToken, deviceToken, payload string, ti
 	param["expire_time"] = []string{originParam["expire_time"]}
 
 	// push
-	res, _ := FormPost(reqUrl, param)
+	res, err := FormPost(reqUrl, param)
 
-	return string(res)
+	return string(res), err
 }
-func (hc *HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string, timeToLive int) string {
-	accessToken := hc.GetToken()
+func (hc *HuaweiPushClient) PushMsgToList(deviceTokens []string, payload string, timeToLive int) (string, error) {
+	accessToken, err := hc.GetToken()
+	if err != nil {
+		return "", err
+	}
 	return hc.PushToListWithToken(accessToken, deviceTokens, payload, timeToLive)
 }
 
-func (hc *HuaweiPushClient) PushToListWithToken(accessToken string, deviceTokens []string, payload string, timeToLive int) string {
+func (hc *HuaweiPushClient) PushToListWithToken(accessToken string, deviceTokens []string, payload string, timeToLive int) (string, error) {
 	reqUrl := PUSH_URL + "?nsp_ctx=" + url.QueryEscape(hc.NspCtx)
 
 	now := time.Now()
@@ -225,14 +228,16 @@ func (hc *HuaweiPushClient) PushToListWithToken(accessToken string, deviceTokens
 	param["expire_time"] = []string{originParam["expire_time"]}
 
 	// push
-	res, _ := doPost(context.Background(), reqUrl, param)
+	res, err := doPost(context.Background(), reqUrl, param)
 
-	return string(res)
+	return string(res), err
 }
 
-func (hc *HuaweiPushClient) PushMsgToArrayNoExpire(deviceTokens []string, payload string) string {
-
-	accessToken := hc.GetToken()
+func (hc *HuaweiPushClient) PushMsgToArrayNoExpire(deviceTokens []string, payload string) (string, error) {
+	accessToken, err := hc.GetToken()
+	if err != nil {
+		return "", err
+	}
 	reqUrl := PUSH_URL + "?nsp_ctx=" + url.QueryEscape(hc.NspCtx)
 
 	var originParam = map[string]string{
@@ -257,7 +262,7 @@ func (hc *HuaweiPushClient) PushMsgToArrayNoExpire(deviceTokens []string, payloa
 	param["payload"] = []string{originParam["payload"]}
 
 	// push
-	res, _ := doPost(context.Background(), reqUrl, param)
+	res, err := doPost(context.Background(), reqUrl, param)
 
-	return string(res)
+	return string(res), err
 }
