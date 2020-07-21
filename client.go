@@ -110,10 +110,10 @@ func doPost(ctx context.Context, url string, form url.Values) ([]byte, error) {
 		}
 		defer res.Body.Close()
 
-		if res.StatusCode != http.StatusOK {
-			return nil, errors.New("network error")
-		}
 		result, err = ioutil.ReadAll(res.Body)
+		if res.StatusCode != http.StatusOK {
+			return result, errors.New("network error, http code:"+strconv.Itoa(res.StatusCode))
+		}
 		if err != nil {
 			return nil, err
 		}
