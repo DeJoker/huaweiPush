@@ -13,8 +13,7 @@ var packageName string = ""
 var regID string = ""
 
 
-
-func TestViVoPush_Send(t *testing.T) {
+func TestHuaweiPush_Send(t *testing.T) {
 	client := NewClient(appId, appSecret)
 
 	message := NewMessage()

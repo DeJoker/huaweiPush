@@ -61,20 +61,26 @@ func NewMessage() *Message {
 	}
 }
 
-/**
- * form post
- */
+
+// http base
+
+var (
+	httpclient = &http.Client{
+		Timeout : time.Second * 60,
+	}
+)
+
+
 func FormPost(url string, data url.Values) ([]byte, error) {
 	u := ioutil.NopCloser(strings.NewReader(data.Encode()))
-	r, err := http.Post(url, "application/x-www-form-urlencoded", u)
+	r, err := httpclient.Post(url, "application/x-www-form-urlencoded", u)
 	if err != nil {
-
 		return []byte(""), err
 	}
 	defer r.Body.Close()
+
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-
 		return []byte(""), err
 	}
 	return b, err
@@ -90,11 +96,10 @@ func doPost(ctx context.Context, url string, form url.Values) ([]byte, error) {
 		return nil, errors.New(("create post request error"))
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
-	client := &http.Client{}
 	tryTime := 0
 
 	for tryTime < PostRetryTimes {
-		res, err = ctxhttp.Do(ctx, client, req)
+		res, err = ctxhttp.Do(ctx, httpclient, req)
 		if err != nil {
 			fmt.Println("huawei push post err:", err, tryTime)
 			select {
@@ -153,7 +158,7 @@ func (hc *HuaweiPushClient) GetToken() (string, error) {
 		return "", err
 	}
 	hc.AuthInfo = tokenRes
-	hc.AuthInfo.validTime = now + OneHour
+	hc.AuthInfo.validTime = now + int64(hc.AuthInfo.ExpiresIn*2/3) // 提前过期token时间到2/3
 	return tokenRes.AccessToken, nil
 }
 
